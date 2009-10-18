@@ -31,6 +31,8 @@ Control.ScrollBar = Class.create({
             scroll_to_smoothing: 0.01,
             scroll_to_steps: 15,
             proportional: true,
+            always_show_track: false,
+            always_show_track_length: 50,
             slider_options: {}
         },options || {});
         this.slider = new Control.Slider(this.handle,this.track,Object.extend({
@@ -52,6 +54,9 @@ Control.ScrollBar = Class.create({
         this.enabled = true;
         this.container.observe('mouse:wheel',this.boundMouseWheelEvent);
         this.slider.setEnabled();
+        if(this.options.always_show_track){
+          this.handle.removeClassName('inactive');
+        }
         this.track.show();
         if(this.options.active_class_name)
             $(this.options.apply_active_class_name_to).addClassName(this.options.active_class_name);
@@ -61,7 +66,13 @@ Control.ScrollBar = Class.create({
         this.enabled = false;
         this.container.stopObserving('mouse:wheel',this.boundMouseWheelEvent);
         this.slider.setDisabled();
-        this.track.hide();
+        if(this.options.always_show_track){
+            this.handle.style.height = this.options.always_show_track_length+'px';
+            this.handle.addClassName('inactive');
+            this.slider.handleLength = this.handle.style.height.replace(/px/,'');
+        }else{
+            this.track.hide();
+        }
         if(this.options.active_class_name)
             $(this.options.apply_active_class_name_to).removeClassName(this.options.active_class_name);
         this.notify('disabled');
